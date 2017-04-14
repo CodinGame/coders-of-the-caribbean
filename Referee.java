@@ -915,7 +915,7 @@ class Referee extends MultiReferee {
                     case FIRE:
                         int distance = ship.bow().distanceTo(ship.target);
                         if (ship.target.isInsideMap() && distance <= FIRE_DISTANCE_MAX && ship.cannonCooldown == 0) {
-                            int travelTime = 1 + Math.round(ship.bow().distanceTo(ship.target) / 3);
+                            int travelTime = (int) (1 + Math.round(ship.bow().distanceTo(ship.target) / 3.0));
                             cannonballs.add(new Cannonball(ship.target.x, ship.target.y, ship.id, ship.bow().x, ship.bow().y, travelTime));
                             ship.cannonCooldown = COOLDOWN_CANNON;
                         }
