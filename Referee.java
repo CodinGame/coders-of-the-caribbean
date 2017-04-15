@@ -1013,10 +1013,6 @@ class Referee extends MultiReferee {
 
             for (Player player : players) {
                 for (Ship ship : player.shipsAlive) {
-                    if (ship.health == 0) {
-                        continue;
-                    }
-
                     ship.position = ship.newPosition;
                     if (checkCollisions(ship)) {
                         shipLosts.add(ship);
