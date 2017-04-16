@@ -1058,10 +1058,6 @@ class Referee extends MultiReferee {
         // Apply rotation
         for (Player player : players) {
             for (Ship ship : player.shipsAlive) {
-                if (ship.health == 0) {
-                    continue;
-                }
-
                 ship.orientation = ship.newOrientation;
                 if (checkCollisions(ship)) {
                     shipLosts.add(ship);
