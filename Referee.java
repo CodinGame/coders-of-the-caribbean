@@ -905,9 +905,10 @@ class Referee extends MultiReferee {
 
                             if (target.isInsideMap()) {
                                 boolean cellIsFreeOfBarrels = barrels.stream().noneMatch(barrel -> barrel.position.equals(target));
+                                boolean cellIsFreeOfMines = mines.stream().noneMatch(mine -> mine.position.equals(target));
                                 boolean cellIsFreeOfShips = ships.stream().filter(b -> b != ship).noneMatch(b -> b.at(target));
 
-                                if (cellIsFreeOfBarrels && cellIsFreeOfShips) {
+                                if (cellIsFreeOfBarrels && cellIsFreeOfShips && cellIsFreeOfMines) {
                                     ship.mineCooldown = COOLDOWN_MINE;
                                     Mine mine = new Mine(target.x, target.y);
                                     mines.add(mine);
