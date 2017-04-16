@@ -756,6 +756,7 @@ class Referee extends MultiReferee {
                 barrels.add(m);
             }
         }
+        barrelCount = barrels.size();
 
     }
 
