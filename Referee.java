@@ -712,14 +712,11 @@ class Referee extends MultiReferee {
             int y = 1 + random.nextInt(MAP_HEIGHT / 2);
 
             Mine m = new Mine(x, y);
-            boolean valid = true;
-            for (Ship ship : this.ships) {
-                if (ship.at(m.position)) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (valid) {
+
+            boolean cellIsFreeOfMines = mines.stream().noneMatch(mine -> mine.position.equals(m.position));
+            boolean cellIsFreeOfShips = ships.stream().noneMatch(ship -> ship.at(m.position));
+
+            if (cellIsFreeOfShips && cellIsFreeOfMines) {
                 if (y != MAP_HEIGHT - 1 - y) {
                     mines.add(new Mine(x, MAP_HEIGHT - 1 - y));
                 }
@@ -736,20 +733,12 @@ class Referee extends MultiReferee {
             int h = MIN_RUM_BARREL_VALUE + random.nextInt(1 + MAX_RUM_BARREL_VALUE - MIN_RUM_BARREL_VALUE);
 
             RumBarrel m = new RumBarrel(x, y, h);
-            boolean valid = true;
-            for (Ship ship : this.ships) {
-                if (ship.at(m.position)) {
-                    valid = false;
-                    break;
-                }
-            }
-            for (Mine mine : this.mines) {
-                if (mine.position.equals(m.position)) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (valid) {
+
+            boolean cellIsFreeOfBarrels = barrels.stream().noneMatch(barrel -> barrel.position.equals(m.position));
+            boolean cellIsFreeOfMines = mines.stream().noneMatch(mine -> mine.position.equals(m.position));
+            boolean cellIsFreeOfShips = ships.stream().noneMatch(ship -> ship.at(m.position));
+
+            if (cellIsFreeOfShips && cellIsFreeOfMines && cellIsFreeOfBarrels) {
                 if (y != MAP_HEIGHT - 1 - y) {
                     barrels.add(new RumBarrel(x, MAP_HEIGHT - 1 - y, h));
                 }
