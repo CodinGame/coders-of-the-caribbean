@@ -352,6 +352,7 @@ class Referee extends MultiReferee {
         int orientation;
         int speed;
         int health;
+        int initialHealth;
         int owner;
         String message;
         Action action;
@@ -641,7 +642,6 @@ class Referee extends MultiReferee {
     private List<Player> players;
     private List<Ship> ships;
     private List<Damage> damage;
-    private List<Ship> shipLosts;
     private List<Coord> cannonBallExplosions;
     private int shipsPerPlayer;
     private int mineCount;
@@ -679,7 +679,6 @@ class Referee extends MultiReferee {
         cannonballs = new ArrayList<>();
         cannonBallExplosions = new ArrayList<>();
         damage = new ArrayList<>();
-        shipLosts = new ArrayList<>();
 
         // Generate Players
         this.players = new ArrayList<Player>(playerCount);
@@ -780,7 +779,6 @@ class Referee extends MultiReferee {
         }
         cannonBallExplosions.clear();
         damage.clear();
-        shipLosts.clear();
     }
 
     @Override
@@ -846,6 +844,12 @@ class Referee extends MultiReferee {
     private void decrementRum() {
         for (Ship ship : ships) {
             ship.damage(1);
+        }
+    }
+
+    private void updateInitialRum() {
+        for (Ship ship : ships) {
+            ship.initialHealth = ship.health;
         }
     }
 
@@ -928,7 +932,7 @@ class Referee extends MultiReferee {
         }
     }
 
-    private boolean checkCollisions(Ship ship) {
+    private void checkCollisions(Ship ship) {
         Coord bow = ship.bow();
         Coord stern = ship.stern();
         Coord center = ship.position;
@@ -952,8 +956,6 @@ class Referee extends MultiReferee {
                 it.remove();
             }
         }
-
-        return ship.health <= 0;
     }
 
     private void moveShips() {
@@ -1014,9 +1016,7 @@ class Referee extends MultiReferee {
             for (Player player : players) {
                 for (Ship ship : player.shipsAlive) {
                     ship.position = ship.newPosition;
-                    if (checkCollisions(ship)) {
-                        shipLosts.add(ship);
-                    }
+                    checkCollisions(ship);
                 }
             }
         }
@@ -1059,9 +1059,7 @@ class Referee extends MultiReferee {
         for (Player player : players) {
             for (Ship ship : player.shipsAlive) {
                 ship.orientation = ship.newOrientation;
-                if (checkCollisions(ship)) {
-                    shipLosts.add(ship);
-                }
+                checkCollisions(ship);
             }
         }
     }
@@ -1128,6 +1126,7 @@ class Referee extends MultiReferee {
     protected void updateGame(int round) throws GameOverException {
         moveCannonballs();
         decrementRum();
+        updateInitialRum();
 
         applyActions();
         moveShips();
@@ -1137,8 +1136,14 @@ class Referee extends MultiReferee {
         explodeMines();
         explodeBarrels();
 
-        for (Ship ship : shipLosts) {
-            barrels.add(new RumBarrel(ship.position.x, ship.position.y, REWARD_RUM_BARREL_VALUE));
+        // For each sunk ship, create a new rum barrel with the amount of rum the ship had at the begin of the turn (up to 30).
+        for (Ship ship : ships) {
+            if (ship.health <= 0) {
+                int reward = Math.min(REWARD_RUM_BARREL_VALUE, ship.initialHealth);
+                if (reward > 0) {
+                    barrels.add(new RumBarrel(ship.position.x, ship.position.y, reward));
+                }
+            }
         }
 
         for (Coord position : cannonBallExplosions) {
