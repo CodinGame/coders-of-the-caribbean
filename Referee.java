@@ -1188,7 +1188,7 @@ class Referee extends MultiReferee {
         // Visible mines
         for (Mine mine : mines) {
             boolean visible = false;
-            for (Ship ship : players.get(playerIdx).ships) {
+            for (Ship ship : players.get(playerIdx).shipsAlive) {
                 if (ship.position.distanceTo(mine.position) <= MINE_VISIBILITY_RANGE) {
                     visible = true;
                     break;
