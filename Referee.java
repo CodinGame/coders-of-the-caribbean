@@ -1004,11 +1004,14 @@ class Referee extends MultiReferee {
                 collisions.clear();
             }
 
-            for (Player player : players) {
-                for (Ship ship : player.shipsAlive) {
-                    ship.position = ship.newPosition;
-                    checkCollisions(ship);
-                }
+            // Move ships to their new location
+            for (Ship ship : this.ships) {
+                ship.position = ship.newPosition;
+            }
+
+            // Check collisions
+            for (Ship ship : this.ships) {
+                checkCollisions(ship);
             }
         }
     }
@@ -1047,11 +1050,13 @@ class Referee extends MultiReferee {
         }
 
         // Apply rotation
-        for (Player player : players) {
-            for (Ship ship : player.shipsAlive) {
-                ship.orientation = ship.newOrientation;
-                checkCollisions(ship);
-            }
+        for (Ship ship : this.ships) {
+            ship.orientation = ship.newOrientation;
+        }
+
+        // Check collisions
+        for (Ship ship : this.ships) {
+            checkCollisions(ship);
         }
     }
 
