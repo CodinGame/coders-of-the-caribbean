@@ -923,12 +923,11 @@ class Referee extends MultiReferee {
         }
     }
 
-    private void checkCollisions(Ship ship) {
+    private void checkBarrelCollisions(Ship ship) {
         Coord bow = ship.bow();
         Coord stern = ship.stern();
         Coord center = ship.position;
 
-        // Collision with the barrels
         for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext();) {
             RumBarrel barrel = it.next();
             if (barrel.position.equals(bow) || barrel.position.equals(stern) || barrel.position.equals(center)) {
@@ -936,8 +935,9 @@ class Referee extends MultiReferee {
                 it.remove();
             }
         }
+    }
 
-        // Collision with the mines
+    private void checkMineCollisions() {
         for (Iterator<Mine> it = mines.iterator(); it.hasNext();) {
             Mine mine = it.next();
             List<Damage> mineDamage = mine.explode(ships, false);
@@ -947,6 +947,16 @@ class Referee extends MultiReferee {
                 it.remove();
             }
         }
+    }
+
+    private void checkCollisions() {
+        // Check collisions with Barrels
+        for (Ship ship : this.ships) {
+            checkBarrelCollisions(ship);
+        }
+
+        // Check collisions with Mines
+        checkMineCollisions();
     }
 
     private void moveShips() {
@@ -1009,10 +1019,7 @@ class Referee extends MultiReferee {
                 ship.position = ship.newPosition;
             }
 
-            // Check collisions
-            for (Ship ship : this.ships) {
-                checkCollisions(ship);
-            }
+            checkCollisions();
         }
     }
 
@@ -1054,10 +1061,7 @@ class Referee extends MultiReferee {
             ship.orientation = ship.newOrientation;
         }
 
-        // Check collisions
-        for (Ship ship : this.ships) {
-            checkCollisions(ship);
-        }
+        checkCollisions();
     }
 
     private boolean gameIsOver() {
