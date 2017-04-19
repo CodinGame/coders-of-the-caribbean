@@ -100,6 +100,15 @@ class Referee extends MultiReferee {
         return Math.max(min, Math.min(max, val));
     }
 
+    public static long parseProperty(Properties prop, String key, long defaultValue) {
+        try {
+            return Long.valueOf(prop.getProperty(key));
+        } catch (NumberFormatException e) {
+            // Ignore invalid data
+        }
+        return defaultValue;
+    }
+
     @SafeVarargs
     static final <T> String join(T... v) {
         return Stream.of(v).map(String::valueOf).collect(Collectors.joining(" "));
@@ -658,22 +667,20 @@ class Referee extends MultiReferee {
 
     @Override
     protected void initReferee(int playerCount, Properties prop) throws InvalidFormatException {
-        seed = Long.valueOf(prop.getProperty("seed", String.valueOf(new Random(System.currentTimeMillis()).nextLong())));
+        seed = parseProperty(prop, "seed", new Random(System.currentTimeMillis()).nextLong());
+
         random = new Random(this.seed);
 
-        shipsPerPlayer = clamp(
-                Integer.valueOf(prop.getProperty("shipsPerPlayer", String.valueOf(random.nextInt(1 + MAX_SHIPS - MIN_SHIPS) + MIN_SHIPS))), MIN_SHIPS,
+        shipsPerPlayer = clamp((int) parseProperty(prop, "shipsPerPlayer", random.nextInt(1 + MAX_SHIPS - MIN_SHIPS) + MIN_SHIPS), MIN_SHIPS,
                 MAX_SHIPS);
 
         if (MAX_MINES > MIN_MINES) {
-            mineCount = clamp(Integer.valueOf(prop.getProperty("mineCount", String.valueOf(random.nextInt(MAX_MINES - MIN_MINES) + MIN_MINES))),
-                    MIN_MINES, MAX_MINES);
+            mineCount = clamp((int) parseProperty(prop, "mineCount", random.nextInt(MAX_MINES - MIN_MINES) + MIN_MINES), MIN_MINES, MAX_MINES);
         } else {
             mineCount = MIN_MINES;
         }
 
-        barrelCount = clamp(
-                Integer.valueOf(prop.getProperty("barrelCount", String.valueOf(random.nextInt(MAX_RUM_BARRELS - MIN_RUM_BARRELS) + MIN_RUM_BARRELS))),
+        barrelCount = clamp((int) parseProperty(prop, "barrelCount", random.nextInt(MAX_RUM_BARRELS - MIN_RUM_BARRELS) + MIN_RUM_BARRELS),
                 MIN_RUM_BARRELS, MAX_RUM_BARRELS);
 
         cannonballs = new ArrayList<>();
